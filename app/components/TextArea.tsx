@@ -1,62 +1,54 @@
 "use client";
-import React from "react";
-import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
-import clsx from 'clsx';
-import { wrapWordsWithSpans } from '@/app/lib/textUtils';
-import sanitizeHtml from "sanitize-html";
+import React, { useEffect, useState, useRef } from "react";
+import clsx, { ClassArray, ClassDictionary } from "clsx";
+import SentenceItemWrapper from "../lib/WordWrapper";
+import TranslationBox from "@/app/components/TranslationBox";
+import { sampleData } from "@/app/lib/types";
+import handleSelectionChange from "@/app/lib/selectionHandler";
 
-type TextAreaState = {
-  html: string;
-};
+export default function TextArea(props: { className: string }) {
+  const [translation, setTranslation] = useState<string>("");
+  const [position, setPosition] = useState<Record<string, number>>({
+    x: 0,
+    y: 0,
+  });
+  const [selecting, setSelecting] = useState<boolean>(false);
+  const translationBoxRef = useRef(null);
 
-interface TextAreaProps {
-  className: string
-  html: string
-}
+  const className = clsx("editable", "w-full h-80", props.className);
 
+  useEffect(() => {
+    const selectionChangeHandler = () =>
+      handleSelectionChange(setTranslation, setPosition, setSelecting);
+    document.addEventListener("selectionchange", selectionChangeHandler);
 
-export default class TextArea extends React.Component<TextAreaProps, TextAreaState> {
-  constructor(props: TextAreaProps) {
-    super(props);
-    this.state = {
-      html: this.props.html || `Default text :)`,
+    return () => {
+      document.removeEventListener("selectionchange", selectionChangeHandler);
     };
-  }
+  }, []);
 
+  const sentenceData = sampleData;
 
-  handleChange = (evt: ContentEditableEvent) => {
-    //const newHtml = wrapWordsWithSpans(evt.target.value);
-    const newHtml = evt.target.value;
-    this.setState({ html: sanitizeHtml(newHtml, this.sanitizeConf) });
-  };
-
-
-
-  sanitizeConf = {
-    allowedTags: ["i", "em", "strong", "p", "h1"],
-  };
-
-  sanitize = () => {
-    this.setState({ html: sanitizeHtml(this.state.html, this.sanitizeConf) });
-  };
-
-  className = clsx(
-    "editable",
-    "w-full h-80",
-    this.props.className,
-  )
-
-  render = () => {
-    return (
-
-      <ContentEditable
-        className={`${this.className} border-4 text-2xl pt-2 px-4`}
-        tagName="div"
-        html={this.state.html} // innerHTML of the editable div
-        onChange={this.handleChange} // handle innerHTML change
-        onBlur={this.sanitize}
-      />
-    );
-  };
+  return (
+    <>
+      <TranslationBox translation={translation} position={position} />
+      <div className={`${className} border-4 text-2xl pt-2 px-4`}>
+        {sentenceData.sentenceItems.map((sentenceItem, index) => (
+          <React.Fragment key={index}>
+            <SentenceItemWrapper
+              sentenceItem={sentenceItem}
+              setTranslation={setTranslation}
+              setPosition={setPosition}
+              selecting={selecting}
+            />{" "}
+          </React.Fragment>
+        ))}
+      </div>
+      <p>Translation: {translation}</p>
+      <p>
+        Position: {position.x}, {position.y}
+      </p>
+      <p>Selecting: {selecting ? "yes" : "no"}</p>
+    </>
+  );
 }
-

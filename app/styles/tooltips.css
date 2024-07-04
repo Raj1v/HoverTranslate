@@ -1,0 +1,31 @@
+/* styles/Tooltips.css */
+
+.tooltipBox {
+    /* Positioning */
+    @apply absolute -top-6 left-0;
+
+    /* Size */
+    /* @apply w-[80px] h-[30px]; */
+
+    /* Background and text color */
+    @apply bg-gray-800 text-white;
+
+    /* Border radius */
+    @apply rounded-md;
+
+    /* Prevent text wrapping */
+    @apply whitespace-nowrap;
+
+
+    /* Text size */
+    @apply text-lg;
+
+    /* Margin and padding */
+    @apply p-2 px-6;
+
+    /* Initial opacity and transition */
+    @apply opacity-0 transition-opacity duration-300;
+
+    /* After pseudo-element for the tooltip arrow */
+    @apply after:absolute after:top-full after:left-1/2 after:-translate-x-2 after:h-0 after:w-0 after:border-x-[6px] after:border-x-transparent after:border-b-[8px] after:border-b-black after:rotate-180;
+}
