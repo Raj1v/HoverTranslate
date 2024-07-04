@@ -5,6 +5,7 @@ import SentenceItemWrapper from "../lib/WordWrapper";
 import TranslationBox from "@/app/components/TranslationBox";
 import { sampleData } from "@/app/lib/types";
 import handleSelectionChange from "@/app/lib/selectionHandler";
+// Get a random sentence from the sample data
 
 export default function TextArea(props: { className: string }) {
   const [translation, setTranslation] = useState<string>("");
@@ -16,6 +17,11 @@ export default function TextArea(props: { className: string }) {
   const translationBoxRef = useRef(null);
 
   const className = clsx("editable", "w-full h-80", props.className);
+  const [sentenceData, setSentenceData] = useState(sampleData[0]);
+
+  useEffect(() => {
+    setSentenceData(sampleData[Math.floor(Math.random() * sampleData.length)]);
+  }, []);
 
   useEffect(() => {
     const selectionChangeHandler = () =>
@@ -26,8 +32,6 @@ export default function TextArea(props: { className: string }) {
       document.removeEventListener("selectionchange", selectionChangeHandler);
     };
   }, []);
-
-  const sentenceData = sampleData;
 
   return (
     <>
