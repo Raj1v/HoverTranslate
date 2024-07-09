@@ -113,15 +113,15 @@ export default function TextArea(props: {
         className={`${className} border rounded-lg text-2xl pt-2 px-4`}
         onBlur={reloadTranslation}
         onChange={(event) => {
-          return;
+          setInnerHTML(event.target.value);
         }}
       />
-      <p>Translation: {translation}</p>
+      {/* <p>Translation: {translation}</p>
       <p>
         Position: {position.x}, {position.y}
       </p>
       <p>Selecting: {selectingRef.current ? "yes" : "no"}</p>
-      <p>Current hover: {currentHover.current}</p>
+      <p>Current hover: {currentHover.current}</p> */}
     </>
   );
 }
