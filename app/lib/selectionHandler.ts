@@ -7,7 +7,6 @@ const sentenceItemWrapperClass = "tooltip";
 const handleSelectionChange = (
   setActiveTranslation: Dispatch<SetStateAction<SentenceItem[] | null>>,
   setPosition: (value: SetStateAction<{ x: number; y: number }>) => void,
-  //setSelecting: (value: SetStateAction<boolean>) => void
   selectingRef: React.MutableRefObject<boolean>
 ) => {
   const activeSelection = document.getSelection();

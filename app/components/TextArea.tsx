@@ -6,6 +6,7 @@ import SentenceItemWrapper from "../lib/WordWrapper";
 import TranslationBox from "@/app/components/TranslationBox";
 import { sampleData, TranslationData, SentenceItem } from "@/app/lib/types";
 import handleSelectionChange from "@/app/lib/selectionHandler";
+import { handleStartHover, handleEndHover } from "@/app/lib/hoverHandler";
 import { useTranslationContext } from "@/app/TranslationContext";
 import ContentEditable from "react-contenteditable";
 
@@ -71,41 +72,20 @@ export default function TextArea(props: {
   useEffect(() => {
     // Function to handle mouseenter event
     const handleMouseEnter = (event: Event) => {
-      if (selectingRef.current) return; // Selecting takes precedence over hovering
-      const target = event.target as Element;
-      console.log(target);
-      const sentenceItemId = target.getAttribute("data-sentence-item-id");
-      if (!sentenceItemId) {
-        throw new Error("No sentence item ID found on span");
-      }
-
-      const sentenceItem =
-        translationData?.sentenceItems[parseInt(sentenceItemId)];
-
-      if (!sentenceItem) {
-        throw new Error("No sentence item found for ID");
-      }
-      setActiveTranslation([sentenceItem]);
-      setPosition({
-        x:
-          target.getBoundingClientRect().left +
-          target.getBoundingClientRect().width / 2,
-        y: target.getBoundingClientRect().top,
-      });
-      currentHover.current = sentenceItemId;
-      console.log("Current hover: ", currentHover.current);
+      event.preventDefault();
+      handleStartHover(
+        event,
+        translationData,
+        setActiveTranslation,
+        setPosition,
+        selectingRef,
+        currentHover
+      );
     };
 
     const handleMouseLeave = (event: Event) => {
-      if (selectingRef.current) return; // Selecting takes precedence over hovering
-      const target = event.target as Element;
-      const sentenceItemId = target.getAttribute("data-sentence-item-id");
-      console.log(sentenceItemId);
-      console.log(currentHover.current);
-      if (currentHover.current === sentenceItemId) {
-        setActiveTranslation([]);
-        currentHover.current = null;
-      }
+      event.preventDefault();
+      handleEndHover(event, selectingRef, setActiveTranslation, currentHover);
     };
 
     // Attach mouseenter event handlers to all spans
