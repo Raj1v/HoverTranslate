@@ -23,7 +23,7 @@ export default function TextArea(props: {
     x: 0,
     y: 0,
   });
-  const [selecting, setSelecting] = useState<boolean>(false);
+  const selectingRef = useRef<boolean>(false);
   const currentHover = useRef<string | null>(null);
   const [innerHTML, setInnerHTML] = useState<string>("");
 
@@ -59,7 +59,7 @@ export default function TextArea(props: {
   useEffect(() => {
     const selectionChangeHandler = (event: Event) => {
       event.preventDefault();
-      handleSelectionChange(setActiveTranslation, setPosition, setSelecting);
+      handleSelectionChange(setActiveTranslation, setPosition, selectingRef);
     };
     document.addEventListener("selectionchange", selectionChangeHandler);
 
@@ -71,7 +71,7 @@ export default function TextArea(props: {
   useEffect(() => {
     // Function to handle mouseenter event
     const handleMouseEnter = (event: Event) => {
-      if (selecting) return; // Selecting takes precedence over hovering
+      if (selectingRef.current) return; // Selecting takes precedence over hovering
       const target = event.target as Element;
       console.log(target);
       const sentenceItemId = target.getAttribute("data-sentence-item-id");
@@ -97,7 +97,7 @@ export default function TextArea(props: {
     };
 
     const handleMouseLeave = (event: Event) => {
-      if (selecting) return; // Selecting takes precedence over hovering
+      if (selectingRef.current) return; // Selecting takes precedence over hovering
       const target = event.target as Element;
       const sentenceItemId = target.getAttribute("data-sentence-item-id");
       console.log(sentenceItemId);
@@ -123,7 +123,7 @@ export default function TextArea(props: {
         span.removeEventListener("mouseleave", handleMouseLeave);
       });
     };
-  }, [innerHTML]); // Dependency array, re-run effect when innerHTML changes
+  }, [innerHTML]);
 
   return (
     <>
@@ -140,7 +140,7 @@ export default function TextArea(props: {
       <p>
         Position: {position.x}, {position.y}
       </p>
-      <p>Selecting: {selecting ? "yes" : "no"}</p>
+      <p>Selecting: {selectingRef.current ? "yes" : "no"}</p>
       <p>Current hover: {currentHover.current}</p>
     </>
   );
