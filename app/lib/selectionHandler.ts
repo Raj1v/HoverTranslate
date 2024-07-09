@@ -1,17 +1,24 @@
-import { SetStateAction } from "react";
+import { SetStateAction, Dispatch } from "react";
+import { htmlElementToSentenceItem } from "@/app/lib/textUtils";
+import { SentenceItem } from "@/app/lib/types";
 
+const sentenceItemWrapperClass = "tooltip";
 
 const handleSelectionChange = (
-  setTranslation: (value: SetStateAction<string>) => void,
-  setPosition: (value: SetStateAction<Record<string, number>>) => void,
+  setActiveTranslation: Dispatch<SetStateAction<SentenceItem[] | null>>,
+  setPosition: (value: SetStateAction<{ x: number; y: number }>) => void,
   setSelecting: (value: SetStateAction<boolean>) => void
 ) => {
   const activeSelection = document.getSelection();
-  
-  if (!activeSelection) {
-    setSelecting(false);
-    return;
-  }
+
+
+  // Check if the selection is empty
+    if (!activeSelection || activeSelection.toString() === "") {
+      setSelecting(false);
+      setActiveTranslation(null);
+      return;
+    }
+
   setSelecting(true);
 
   let anchorNode = activeSelection.anchorNode as Element;
@@ -28,10 +35,9 @@ const handleSelectionChange = (
   if (
     anchorNode &&
     focusNode &&
-    anchorNode.classList.contains("tooltip") &&
-    focusNode.classList.contains("tooltip")
+    anchorNode.classList.contains(sentenceItemWrapperClass) &&
+    focusNode.classList.contains(sentenceItemWrapperClass)
   ) {
-    
     // Create a range object
     const range = document.createRange();
     if (
@@ -46,29 +52,27 @@ const handleSelectionChange = (
     ) {
       range.setStart(focusNode, 0);
       range.setEnd(anchorNode, anchorNode.childNodes.length);
-
     } else if (anchorNode == focusNode) {
       range.selectNode(anchorNode);
-
     }
+
 
     // Loop through the range and get the outer HTML
-    let text = "";
     const clonedContents = range.cloneContents();
-    const spans = clonedContents.querySelectorAll("span.tooltip");
+    const spans = clonedContents.querySelectorAll(
+      `span.${sentenceItemWrapperClass}`
+    );
 
+    let selectedSentenceItems: SentenceItem[] = [];
     spans.forEach((span) => {
-    text += span.getAttribute("data-translation") + " ";
+      const setenceItem = htmlElementToSentenceItem(span);
+      selectedSentenceItems.push(setenceItem)
     });
 
-    setTranslation(text);
+    setActiveTranslation(selectedSentenceItems);
   }
-  
-  // Check if the selection is empty
-    if (activeSelection.toString() === "") {
-        setSelecting(false);
-        return;
-    }
+
+
   const rect = activeSelection.getRangeAt(0).getBoundingClientRect();
 
   setPosition({

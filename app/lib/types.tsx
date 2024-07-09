@@ -3,7 +3,7 @@ export type SentenceItem = {
   translation: string;
 };
 
-export type SentenceData = {
+export type TranslationData = {
   sentenceItems: SentenceItem[];
   source_language: string;
   target_language: string;
@@ -11,7 +11,7 @@ export type SentenceData = {
 
 // Mock sentence data
 
-export const sampleDataSpanish: SentenceData = {
+export const sampleDataSpanish: TranslationData = {
   source_language: "es",
   target_language: "en",
   sentenceItems: [
@@ -31,7 +31,7 @@ export const sampleDataSpanish: SentenceData = {
   ],
 };
 
-export const sampleDataGerman: SentenceData = {
+export const sampleDataGerman: TranslationData = {
   source_language: "de",
   target_language: "en",
   sentenceItems: [
@@ -45,7 +45,7 @@ export const sampleDataGerman: SentenceData = {
   ],
 };
 
-export const sampleDataFrench: SentenceData = {
+export const sampleDataFrench: TranslationData = {
   source_language: "fr",
   target_language: "en",
   sentenceItems: [
@@ -63,7 +63,7 @@ export const sampleDataFrench: SentenceData = {
   ],
 };
 
-export const sampleDataSwissGerman: SentenceData = {
+export const sampleDataSwissGerman: TranslationData = {
   source_language: "de-CH",
   target_language: "en",
   sentenceItems: [
@@ -78,7 +78,7 @@ export const sampleDataSwissGerman: SentenceData = {
   ],
 };
 
-export const sampleData: SentenceData[] = [
+export const sampleData: TranslationData[] = [
   sampleDataSpanish,
   sampleDataGerman,
   sampleDataFrench,

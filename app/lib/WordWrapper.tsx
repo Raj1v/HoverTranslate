@@ -4,32 +4,18 @@ import "@/app/styles/tooltips.css";
 import { SentenceItem } from "../lib/types";
 
 interface SentenceItemWrapperProps {
-  sentenceItem: SentenceItem;
-  setTranslation: (translation: string) => void;
-  setPosition: (position: Record<string, number>) => void;
-  selecting: boolean;
+  sentenceItemId: string;
+  children: SentenceItem;
 }
 
 const SentenceItemWrapper = (props: SentenceItemWrapperProps) => {
-  const { sentenceItem, setTranslation, setPosition, selecting } = props;
-
-  const handleMouseEnter = (event: React.MouseEvent) => {
-    if (selecting) return; // Selecting takes precedence over hovering
-    const target = event.target as Element;
-    setTranslation(sentenceItem.translation);
-    setPosition({
-      x:
-        target.getBoundingClientRect().left +
-        target.getBoundingClientRect().width / 2,
-      y: target.getBoundingClientRect().top,
-    });
-  };
+  const { sentenceItemId, children: sentenceItem } = props;
 
   return (
     <span
-      className="tooltip word-wrapper"
+      className="tooltip word-wrapper hover:bg-slate-700 hover:text-gray-100 hover:italic  selection:bg-slate-700 selection:text-slate-200 selection:italic"
       data-translation={sentenceItem.translation}
-      onMouseEnter={handleMouseEnter}
+      data-sentence-item-id={sentenceItemId}
     >
       {sentenceItem.original}
     </span>
