@@ -17,9 +17,17 @@ export default function TextArea(props: {
     React.SetStateAction<SentenceItem[] | null>
   >;
   handleTranslate: (input: string) => void;
+  innerRef: React.RefObject<HTMLDivElement>;
+  setCharCount: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const { translationData } = useTranslationContext();
-  const { activeTranslation, setActiveTranslation, handleTranslate } = props;
+  const {
+    activeTranslation,
+    setActiveTranslation,
+    handleTranslate,
+    innerRef,
+    setCharCount,
+  } = props;
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -113,8 +121,10 @@ export default function TextArea(props: {
         className={`${className} border rounded-lg text-2xl pt-2 px-4`}
         onBlur={reloadTranslation}
         onChange={(event) => {
+          setCharCount(innerRef.current?.textContent?.length || 0);
           setInnerHTML(event.target.value);
         }}
+        innerRef={innerRef}
       />
       {/* <p>Translation: {translation}</p>
       <p>

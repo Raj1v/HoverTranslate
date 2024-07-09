@@ -4,6 +4,7 @@ import TextArea from "@/app/components/TextArea";
 import { TranslationData, SentenceItem } from "@/app/lib/types";
 import { getTranslation, getSampleSentence } from "@/app/actions";
 import LanguageSelection from "@/app/components/LanguageSelection";
+import WordCounter from "@/app/components/WordCounter";
 
 export default function Main() {
   const [targetLaguage, setTargetLanguage] = useState<string>("English");
@@ -16,6 +17,9 @@ export default function Main() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const prevInput = useRef<string>("");
+
+  const textboxRef = useRef<HTMLDivElement>(null);
+  const [charCount, setCharCount] = useState<number>(0);
 
   const handleTranslate = async (input: string) => {
     if (input === prevInput.current) return;
@@ -63,8 +67,11 @@ export default function Main() {
             activeTranslation={activeTranslation}
             setActiveTranslation={setActiveTranslation}
             handleTranslate={handleTranslate}
+            innerRef={textboxRef}
+            setCharCount={setCharCount}
           />
         </div>
+        <WordCounter textboxRef={textboxRef} charCount={charCount} />
       </main>
     </TranslationContext.Provider>
   );

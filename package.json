@@ -9,6 +9,8 @@
     "lint": "pnpm next lint"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^2.1.1",
+    "@headlessui/react": "^2.1.2",
     "@langchain/core": "^0.2.14",
     "@langchain/openai": "^0.2.1",
     "animate.css": "^4.1.1",
