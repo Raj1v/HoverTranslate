@@ -1,19 +1,24 @@
 import { Button } from "@headlessui/react";
-import { ChevronDown, CircleArrowRight } from "lucide-react";
+import { ChevronDown, CircleArrowRight, LoaderCircle } from "lucide-react";
 
 export default function LanguageSelection(props: {
   sourceLanguage: string;
   targetLaguage: string;
   setTargetLanguage: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
 }) {
-  const { sourceLanguage, targetLaguage, setTargetLanguage } = props;
+  const { sourceLanguage, targetLaguage, setTargetLanguage, isLoading } = props;
   return (
     <div className="mt-10 mb-1 flex items-center justify-center flex-row space-x-4">
       <div className="flex-1 flex justify-center">
         <LanguageDropdown language={sourceLanguage} active={false} />
       </div>
       <div className="flex items-center justify-center">
-        <CircleArrowRight />
+        {isLoading ? (
+          <LoaderCircle className="animate-spin" /> // This will show when isLoading is true
+        ) : (
+          <CircleArrowRight /> // This will show when isLoading is false
+        )}{" "}
       </div>
       <div className="flex-1 flex justify-center">
         <LanguageDropdown language={targetLaguage} active={true} />

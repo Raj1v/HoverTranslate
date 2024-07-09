@@ -14,9 +14,18 @@ export default function Main() {
     SentenceItem[] | null
   >(null);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleTranslate = async (input: string) => {
-    const translationData = await getTranslation(input, targetLaguage);
-    setTranslationData(translationData);
+    setLoading(true);
+    try {
+      const translationData = await getTranslation(input, targetLaguage);
+      setTranslationData(translationData);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -43,6 +52,7 @@ export default function Main() {
           sourceLanguage={translationData?.source_language || ""}
           targetLaguage={targetLaguage}
           setTargetLanguage={setTargetLanguage}
+          isLoading={loading}
         />
         <div className="w-full">
           <TextArea
