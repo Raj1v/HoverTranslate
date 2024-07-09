@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { TranslationContext } from "@/app/TranslationContext";
 import TextArea from "@/app/components/TextArea";
 import { TranslationData, SentenceItem } from "@/app/lib/types";
@@ -15,11 +15,14 @@ export default function Main() {
   >(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const prevInput = useRef<string>("");
 
   const handleTranslate = async (input: string) => {
+    if (input === prevInput.current) return;
     setLoading(true);
     try {
       const translationData = await getTranslation(input, targetLaguage);
+      prevInput.current = input;
       setTranslationData(translationData);
     } catch (e) {
       console.error(e);
