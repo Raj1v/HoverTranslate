@@ -6,7 +6,9 @@ export default function Home() {
     <>
       <Main />
       <footer className="flex flex-col items-center justify-center w-full h-20 border-t text-center -mt-16">
-        <p>Made in 🇨🇭</p>
+        <p className="text-lg">
+          Made in <span>🇨🇭</span>
+        </p>
         <p>
           with ❤️ by{" "}
           <a

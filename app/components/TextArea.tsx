@@ -107,9 +107,10 @@ export default function TextArea(props: {
         html={innerHTML}
         className={`${className} border rounded-lg text-2xl pt-2 px-4`}
         onBlur={reloadTranslation}
-        onChange={(event) => {
+        onChange={(event: React.ChangeEvent) => {
+          const target = event.target as HTMLInputElement;
           setCharCount(innerRef.current?.textContent?.length || 0);
-          setInnerHTML(event.target.value);
+          setInnerHTML(target.value);
         }}
         innerRef={innerRef}
         onMouseOver={handleMouseOver}
