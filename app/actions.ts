@@ -1,16 +1,38 @@
 "use server";
-import { translateText } from "@/app/lib/fetch-translation";
+import { translateSentence } from "@/app/lib/fetch-translation";
 import { TranslationData } from "@/app/lib/types";
+import { traceable } from "langsmith/traceable";
+import { ChatOpenAI } from "@langchain/openai";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import {
+  HumanMessagePromptTemplate
+} from "@langchain/core/prompts";
+import { JsonOutputParser } from "@langchain/core/output_parsers";
 
-export async function getTranslation(original: string, targetLanguage: string): Promise<TranslationData>{
+//@ts-ignore
+import SBD from 'sbd';
+
+export const getTranslation = traceable( async (original: string, targetLanguage: string): Promise<TranslationData> =>
+    {
+    const sentences : string[] = SBD.sentences(original);
     try {
-        const result = await translateText(original, targetLanguage);
+        const source_language = await checkLanguage(original);
+        const result = await Promise.all(sentences.map(async (sentence) => {
+            return await translateSentence(sentence, targetLanguage);
+        }))
+
+        const translationData : TranslationData= 
+        {
+            sentences: result,
+            source_language: source_language,
+            target_language: targetLanguage
+        }
         console.log(result)
-        return result as TranslationData;
+        return translationData ;
     } catch (error) {
-        return (error as Error).toString();
+        throw error
     }
-}
+},   { name: "Get Translation" })
 
 const sample_sentences : string[] = [
     "Je parle à mon chien en français pour qu'il devienne bilingue.", // French: "I speak to my dog in French so he becomes bilingual."
@@ -33,4 +55,64 @@ const sample_sentences : string[] = [
 export async function getSampleSentence(): Promise<string> {
     const sentence = sample_sentences[Math.floor(Math.random()*sample_sentences.length)];
     return sentence;
+}
+
+const checkLanguage = async (input: string): Promise<string> => {
+    const instructions = `
+    What language is the input text in?
+
+    --------------------------------------------
+    Input: {input}
+
+    --------------------------------------------
+    Output Format in JSON:
+    {{
+        "language": string
+    }}
+    `;
+    const prompt = HumanMessagePromptTemplate.fromTemplate(instructions);
+    const llm: ChatOpenAI = new ChatOpenAI({
+        model: "gpt-4o",
+        modelKwargs: { response_format: { type: "json_object" } },
+    });
+    const parser = new JsonOutputParser();
+    const chain = prompt.pipe(llm).pipe(parser).withConfig({ runName: "checkLanguage" });
+    const result = await chain.invoke({input});
+    if (result.language === undefined) {
+        throw new Error("Invalid output format");
+    }
+    return result.language;
+}
+
+
+export const checkChange = async (input: string, prevInput: string): Promise<boolean> => {
+    const instructions = `
+    Has the input text change since the last translation?
+
+    Only consider the text content, not the formatting, capitalization, or punctuation.
+
+    --------------------------------------------    
+    Input: {input}
+
+    --------------------------------------------
+    Previous Input: {prevInput}
+    --------------------------------------------
+    Output Format in JSON:
+    {{
+        "explanation": string,
+        "changed": true/false
+    }}
+    `;
+    const prompt = HumanMessagePromptTemplate.fromTemplate(instructions);
+    const llm: ChatOpenAI = new ChatOpenAI({
+        model: "gpt-4o",
+        modelKwargs: { response_format: { type: "json_object" } },
+    });
+    const parser = new JsonOutputParser();
+    const chain = prompt.pipe(llm).pipe(parser).withConfig({ runName: "checkChange" });
+    const result = await chain.invoke({input, prevInput});
+    if (result.changed === undefined) {
+        throw new Error("Invalid output format");
+    }
+    return result.changed;
 }

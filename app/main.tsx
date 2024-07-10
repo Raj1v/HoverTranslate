@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { TranslationContext } from "@/app/TranslationContext";
 import TextArea from "@/app/components/TextArea";
 import { TranslationData, SentenceItem } from "@/app/lib/types";
-import { getTranslation, getSampleSentence } from "@/app/actions";
+import { getTranslation, getSampleSentence, checkChange } from "@/app/actions";
 import LanguageSelection from "@/app/components/LanguageSelection";
 import WordCounter from "@/app/components/WordCounter";
 
@@ -22,7 +22,11 @@ export default function Main() {
   const [charCount, setCharCount] = useState<number>(0);
 
   const handleTranslate = async (input: string) => {
-    if (input === prevInput.current) return;
+    if (prevInput.current != "") {
+      const inputChanged = await checkChange(input, prevInput.current);
+      if (!inputChanged) return;
+    }
+
     setLoading(true);
     try {
       const translationData = await getTranslation(input, targetLaguage);
