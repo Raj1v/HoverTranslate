@@ -2,13 +2,14 @@ import { Dispatch, SetStateAction } from "react";
 import { SentenceItem, TranslationData } from "@/app/lib/types";
 
 export const handleStartHover = (
-    event: Event,
+    event: React.MouseEvent<HTMLElement>,
     translationData: TranslationData | null,
     setActiveTranslation: Dispatch<SetStateAction<SentenceItem[] | null>>,
     setPosition: (value: SetStateAction<{ x: number; y: number }>) => void,
     selectingRef: React.MutableRefObject<boolean>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
+    console.log("hovering");
     if (selectingRef.current) return; // Selecting takes precedence over hovering
     const target = event.target as Element;
     console.log(target);
@@ -35,13 +36,13 @@ export const handleStartHover = (
 
 
 export const handleEndHover = (
-    event: Event,
+    event: React.MouseEvent<HTMLElement>,
     selectingRef: React.MutableRefObject<boolean>,
     setActiveTranslation: Dispatch<SetStateAction<SentenceItem[] | null>>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
     if (selectingRef.current) return; // Selecting takes precedence over hovering
-    const target = event.target as Element;
+    const target = event.target as HTMLElement;
     const sentenceItemId = target.getAttribute("data-sentence-item-id");
     if (currentHoverRef.current === sentenceItemId) {
         setActiveTranslation([]);

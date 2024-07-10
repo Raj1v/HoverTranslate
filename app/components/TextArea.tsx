@@ -77,9 +77,9 @@ export default function TextArea(props: {
     };
   }, []);
 
-  useEffect(() => {
-    // Function to handle mouseenter event
-    const handleMouseEnter = (event: Event) => {
+  const handleMouseOver = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.matches("span.tooltip")) {
       event.preventDefault();
       handleStartHover(
         event,
@@ -89,29 +89,16 @@ export default function TextArea(props: {
         selectingRef,
         currentHover
       );
-    };
+    }
+  };
 
-    const handleMouseLeave = (event: Event) => {
+  const handleMouseOut = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.matches("span.tooltip")) {
       event.preventDefault();
       handleEndHover(event, selectingRef, setActiveTranslation, currentHover);
-    };
-
-    // Attach mouseenter event handlers to all spans
-    const spans = document.querySelectorAll("span.tooltip");
-
-    spans.forEach((span) => {
-      span.addEventListener("mouseenter", handleMouseEnter);
-      span.addEventListener("mouseleave", handleMouseLeave);
-    });
-
-    // Cleanup function to detach event handlers
-    return () => {
-      spans.forEach((span) => {
-        span.removeEventListener("mouseenter", handleMouseEnter);
-        span.removeEventListener("mouseleave", handleMouseLeave);
-      });
-    };
-  }, [innerHTML]);
+    }
+  };
 
   return (
     <>
@@ -125,13 +112,15 @@ export default function TextArea(props: {
           setInnerHTML(event.target.value);
         }}
         innerRef={innerRef}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
       />
-      {/* <p>Translation: {translation}</p>
+      <p>Translation: {translation}</p>
       <p>
         Position: {position.x}, {position.y}
       </p>
       <p>Selecting: {selectingRef.current ? "yes" : "no"}</p>
-      <p>Current hover: {currentHover.current}</p> */}
+      <p>Current hover: {currentHover.current}</p>
     </>
   );
 }
