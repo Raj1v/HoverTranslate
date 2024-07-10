@@ -8,6 +8,7 @@ import { sampleData, TranslationData, SentenceItem } from "@/app/lib/types";
 import handleSelectionChange from "@/app/lib/selectionHandler";
 import { handleStartHover, handleEndHover } from "@/app/lib/hoverHandler";
 import { useTranslationContext } from "@/app/TranslationContext";
+// @ts-ignore
 import ContentEditable from "react-contenteditable";
 
 export default function TextArea(props: {
@@ -49,17 +50,27 @@ export default function TextArea(props: {
   };
 
   useEffect(() => {
-    if (translationData && translationData.sentenceItems.length > 0) {
-      const content = translationData.sentenceItems.map(
-        (sentenceItem, index) => (
-          <React.Fragment key={index}>
-            <SentenceItemWrapper sentenceItemId={index.toString()}>
-              {sentenceItem}
-            </SentenceItemWrapper>{" "}
-          </React.Fragment>
-        )
-      );
-      setInnerHTML(renderToString(content));
+    if (translationData && translationData.sentences.length > 0) {
+      let content = "";
+      translationData.sentences.forEach((sentence, sentenceId) => {
+        const sentence_html = sentence.sentenceItems.map(
+          (sentenceItem, index) => (
+            <React.Fragment key={index}>
+              <SentenceItemWrapper
+                sentenceId={sentenceId}
+                sentenceItemId={index.toString()}
+              >
+                {sentenceItem}
+              </SentenceItemWrapper>
+              {index < sentence.sentenceItems.length - 1 ? " " : ""}
+            </React.Fragment>
+          )
+        );
+        sentence_html.push(<span>. </span>);
+        content += renderToString(sentence_html);
+      });
+
+      setInnerHTML(content);
     } else {
       setInnerHTML("Loading...");
     }
@@ -107,7 +118,7 @@ export default function TextArea(props: {
         html={innerHTML}
         className={`${className} border rounded-lg text-2xl pt-2 px-4`}
         onBlur={reloadTranslation}
-        onChange={(event: React.ChangeEvent) => {
+        onChange={(event) => {
           const target = event.target as HTMLInputElement;
           setCharCount(innerRef.current?.textContent?.length || 0);
           setInnerHTML(target.value);
@@ -116,12 +127,12 @@ export default function TextArea(props: {
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       />
-      <p>Translation: {translation}</p>
+      {/* <p>Translation: {translation}</p>
       <p>
         Position: {position.x}, {position.y}
       </p>
       <p>Selecting: {selectingRef.current ? "yes" : "no"}</p>
-      <p>Current hover: {currentHover.current}</p>
+      <p>Current hover: {currentHover.current}</p> */}
     </>
   );
 }

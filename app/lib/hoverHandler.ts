@@ -14,12 +14,17 @@ export const handleStartHover = (
     const target = event.target as Element;
     console.log(target);
     const sentenceItemId = target.getAttribute("data-sentence-item-id");
+    const sentenceId = target.getAttribute("data-sentence-id");
+
     if (!sentenceItemId) {
       throw new Error("No sentence item ID found on span");
     }
+    if (!sentenceId) {
+      throw new Error("No sentence  ID found on span");
+    }
 
     const sentenceItem =
-      translationData?.sentenceItems[parseInt(sentenceItemId)];
+      translationData?.sentences[parseInt(sentenceId)].sentenceItems[parseInt(sentenceItemId)];
 
     if (!sentenceItem) {
       throw new Error("No sentence item found for ID");

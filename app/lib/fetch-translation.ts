@@ -8,24 +8,12 @@ import {
   SystemMessagePromptTemplate,
 } from "@langchain/core/prompts";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
-import { TranslationData } from "@/app/lib/types";
+import { TranslationData, Sentence, SentenceItem } from "@/app/lib/types";
 
-const mock = {
-    source_language: 'en',
-    target_language: 'it',
-    sentenceItems: [
-      { original: 'Hello!', translation: 'Ciao!' },
-      { original: 'Chiara', translation: 'Chiara' },
-      { original: 'is', translation: 'è' },
-      { original: 'so', translation: 'così' },
-      { original: 'sweet', translation: 'dolce' }
-    ]
-}
-
-export async function translateText(
+export async function translateSentence(
   original: string,
   target_language: string
-): Promise<TranslationData> {
+): Promise<Sentence> {
   const instruction = `
     Translate the following text into the specified target language and provide the output in JSON format as described below. Each sentence in the source text should be broken down into individual word/phrase pairs with their corresponding translations.
     
@@ -35,6 +23,7 @@ export async function translateText(
     
     ### Output:
     The output should be a JSON object with the following structure:
+
     
     \`\`\`json
     {
@@ -48,27 +37,19 @@ export async function translateText(
     }
     \`\`\`
     
-    ### Example:
-    
-    **Input:**
-    1. **Target Language**: "en"
-    2. **Text to Translate**: "I bi nid faul, I bi energie sparend."
-    
-    **Output:**
-    \`\`\`json
-    {
-      "source_language": "Swiss German",
-      "target_language": "English",
-      "sentenceItems": [
-        { "original": "I", "translation": "I" },
-        { "original": "bi", "translation": "am" },
-        { "original": "nid", "translation": "not" },
-        { "original": "faul,", "translation": "lazy," },
-        { "original": "I", "translation": "I" },
-        { "original": "bi", "translation": "am" },
-        { "original": "energie", "translation": "energy" },
-        { "original": "sparend.", "translation": "saving." }
-     
+Guidelines:
+
+- The sentence should be broken down into individual word/phrase pairs with their corresponding translations.
+
+- A sentence item is a pair of original word/phrase and its translation.
+
+- A sentence iteem combines words/phrases that are closely related to each other.
+
+a) For example, in the sentence "I am a student", "I" and "am" should be in the same sentence item.
+
+b) In the sentence "I am a student", "a" and "student" should be in the same sentence item.
+
+c) Prepositions are usually part of the phrase that follows them. For example, in the sentence "I am in the classroom", "in" and "the classroom" should be in the same sentence item.
     `;
   const llm: ChatOpenAI = new ChatOpenAI({
     model: "gpt-4o",
@@ -96,7 +77,7 @@ export async function translateText(
 }
 
 
-async function parseTranslationResult(result: any): Promise<TranslationData> {
+async function parseTranslationResult(result: any): Promise<Sentence> {
   // Ensure the result has the expected structure
   if (
     result.source_language &&
@@ -104,8 +85,6 @@ async function parseTranslationResult(result: any): Promise<TranslationData> {
     Array.isArray(result.sentenceItems)
   ) {
     return {
-      source_language: result.source_language,
-      target_language: result.target_language,
       sentenceItems: result.sentenceItems.map((item: any) => ({
         original: item.original,
         translation: item.translation,

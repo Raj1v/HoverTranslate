@@ -3,8 +3,12 @@ export type SentenceItem = {
   translation: string;
 };
 
-export type TranslationData = {
+export type Sentence = {
   sentenceItems: SentenceItem[];
+};
+
+export type TranslationData = {
+  sentences: Sentence[];
   source_language: string;
   target_language: string;
 };
