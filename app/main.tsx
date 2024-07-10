@@ -35,13 +35,18 @@ export default function Main() {
     }
   };
 
+  const sampleLoaded = useRef(false);
+
   useEffect(() => {
+    if (sampleLoaded.current) return;
+
     const setSampleSentence = async () => {
       const sampleSentence = await getSampleSentence();
       await handleTranslate(sampleSentence);
     };
 
     setSampleSentence();
+    sampleLoaded.current = true;
   }, []);
 
   return (
