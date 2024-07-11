@@ -31,7 +31,7 @@ const WordCounter = (props: {
   //   }, []);
 
   return (
-    <div className="w-full flex justify-end" ref={htmlRef}>
+    <div className="" ref={htmlRef}>
       <span className="text-sm text-neutral-400">{charCount}/300</span>
     </div>
   );

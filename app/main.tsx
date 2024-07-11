@@ -5,8 +5,9 @@ import { TranslationData, SentenceItem } from "@/app/lib/types";
 import { getTranslation, getSampleSentence, checkChange } from "@/app/actions";
 import LanguageSelection from "@/app/components/LanguageSelection";
 import WordCounter from "@/app/components/WordCounter";
+import FeedbackButtons from "@/app/components/FeedbackForm";
 
-export default function Main() {
+export default function Main(props: { className?: string }) {
   const [targetLaguage, setTargetLanguage] = useState<string>("English");
   const [translationData, setTranslationData] =
     useState<TranslationData | null>(null);
@@ -57,7 +58,9 @@ export default function Main() {
     <TranslationContext.Provider
       value={{ translationData, setTranslationData }}
     >
-      <main className="flex min-h-screen flex-col items-center justify-normal p-24 ">
+      <main
+        className={`flex min-h-screen flex-col items-center justify-normal ${props.className}`}
+      >
         <h1 className="text-4xl font-bold">
           <span>Hover</span>
           <span className="italic bg-slate-900 text-white pr-2 ml-1">
@@ -80,7 +83,9 @@ export default function Main() {
             setCharCount={setCharCount}
           />
         </div>
-        <WordCounter textboxRef={textboxRef} charCount={charCount} />
+        <div className="w-full flex justify-end">
+          <WordCounter textboxRef={textboxRef} charCount={charCount} />
+        </div>
       </main>
     </TranslationContext.Provider>
   );
