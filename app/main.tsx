@@ -8,7 +8,7 @@ import WordCounter from "@/app/components/WordCounter";
 import DetailsBox from "@/app/components/DetailsBox";
 
 export default function Main(props: { className?: string }) {
-  const [targetLaguage, setTargetLanguage] = useState<string>("English");
+  const [targetLanguage, setTargetLanguage] = useState<string>("English");
   const [translationData, setTranslationData] =
     useState<TranslationData | null>(null);
 
@@ -17,28 +17,68 @@ export default function Main(props: { className?: string }) {
   >(null);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const prevInput = useRef<string>("");
+  const prevInput = useRef<{
+    input: string | undefined;
+    targetLanguage: string | undefined;
+  }>({
+    input: undefined,
+    targetLanguage: undefined,
+  });
 
   const textboxRef = useRef<HTMLDivElement>(null);
+  const [inputText, setInputText] = useState<string>();
   const [charCount, setCharCount] = useState<number>(0);
 
-  const handleTranslate = async (input: string) => {
-    if (prevInput.current != "") {
-      const inputChanged = await checkChange(input, prevInput.current);
-      if (!inputChanged) return;
-    }
+  // const handleTranslate = async (input: string) => {
+  //   if (prevInput.current != "") {
+  //     const inputChanged = await checkChange(input, prevInput.current);
+  //     if (!inputChanged) return;
+  //   }
 
-    setLoading(true);
-    try {
-      const translationData = await getTranslation(input, targetLaguage);
-      prevInput.current = input;
-      setTranslationData(translationData);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   setLoading(true);
+  //   try {
+  //     const translationData = await getTranslation(input, targetLanguage);
+  //     prevInput.current = input;
+  //     setTranslationData(translationData);
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  useEffect(() => {
+    const translate = async () => {
+      if (!inputText || !targetLanguage) return;
+      if (
+        targetLanguage === prevInput.current?.targetLanguage &&
+        prevInput.current?.input !== undefined
+      ) {
+        const inputChanged = await checkChange(
+          inputText,
+          prevInput.current.input
+        );
+        if (!inputChanged) {
+          return;
+        }
+      }
+
+      setLoading(true);
+
+      try {
+        const translationData = await getTranslation(inputText, targetLanguage);
+        prevInput.current.input = inputText;
+        prevInput.current.targetLanguage = targetLanguage; // Store the current target language
+        setTranslationData(translationData);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    translate();
+  }, [inputText, targetLanguage]);
 
   const sampleLoaded = useRef(false);
 
@@ -47,7 +87,7 @@ export default function Main(props: { className?: string }) {
 
     const setSampleSentence = async () => {
       const sampleSentence = await getSampleSentence();
-      await handleTranslate(sampleSentence);
+      setInputText(sampleSentence);
     };
 
     setSampleSentence();
@@ -73,7 +113,7 @@ export default function Main(props: { className?: string }) {
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <LanguageSelection
               sourceLanguage={translationData?.source_language || ""}
-              targetLaguage={targetLaguage}
+              targetLanguage={targetLanguage}
               setTargetLanguage={setTargetLanguage}
               isLoading={loading}
             />
@@ -85,8 +125,8 @@ export default function Main(props: { className?: string }) {
             className="flex-grow min-w-0"
             activeTranslation={activeTranslation}
             setActiveTranslation={setActiveTranslation}
-            handleTranslate={handleTranslate}
             innerRef={textboxRef}
+            setInputText={setInputText}
             setCharCount={setCharCount}
           />
           <DetailsBox activeTranslation={activeTranslation} />

@@ -1,13 +1,15 @@
 import { Button } from "@headlessui/react";
 import { ChevronDown, CircleArrowRight, LoaderCircle } from "lucide-react";
+import Select from "react-select";
 
 export default function LanguageSelection(props: {
   sourceLanguage: string;
-  targetLaguage: string;
+  targetLanguage: string;
   setTargetLanguage: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
 }) {
-  const { sourceLanguage, targetLaguage, setTargetLanguage, isLoading } = props;
+  const { sourceLanguage, targetLanguage, setTargetLanguage, isLoading } =
+    props;
   return (
     <div
       className={`mt-10 mb-1 flex items-center justify-center flex-row space-x-4`}
@@ -23,7 +25,18 @@ export default function LanguageSelection(props: {
         )}{" "}
       </div>
       <div className="flex-1 flex justify-center">
-        <LanguageDropdown language={targetLaguage} active={true} />
+        <Select
+          className="w-40"
+          value={{ value: targetLanguage, label: targetLanguage }}
+          isClearable={false}
+          onChange={(selectedOption) =>
+            setTargetLanguage(selectedOption?.value || "")
+          }
+          options={commonLanguages.map((language) => ({
+            value: language,
+            label: language,
+          }))}
+        />
       </div>
     </div>
   );
@@ -36,7 +49,7 @@ const LanguageDropdown = (props: { language: string; active: boolean }) => {
   return (
     <Button
       disabled={!active}
-      className="w-full h-10 border rounded py-2 px-4 
+      className="w-40 h-10 border rounded py-2 px-4 
         text-lg text-neutral-800
         flex items-center justify-center"
     >
@@ -46,82 +59,20 @@ const LanguageDropdown = (props: { language: string; active: boolean }) => {
   );
 };
 
-const languages = [
-  "Abkhaz",
-  "Acehnese",
-  "Acholi",
-  "Afar",
-  "Afrikaans",
-  "Albanian",
-  "Alur",
-  "Amharic",
+const commonLanguages = [
   "Arabic",
-  "Armenian",
-  "Assamese",
-  "Avar",
   "Chinese (Simplified)",
   "Chinese (Traditional)",
-  "Chuukese",
-  "Chuvash",
-  "Corsican",
-  "Crimean Tatar",
-  "Croatian",
-  "Czech",
-  "Danish",
-  "Dari",
-  "Dhivehi",
-  "Dinka",
-  "Dogri",
-  "Hebrew",
-  "Hiligaynon",
+  "Dutch",
+  "English",
+  "French",
+  "German",
   "Hindi",
-  "Hmong",
-  "Hungarian",
-  "Hunsrik",
-  "Iban",
-  "Icelandic",
-  "Igbo",
-  "Ilocano",
-  "Indonesian",
-  "Irish",
   "Italian",
-  "Limburgish",
-  "Lingala",
-  "Lithuanian",
-  "Lombard",
-  "Luganda",
-  "Luo",
-  "Luxembourgish",
-  "Macedonian",
-  "Madurese",
-  "Maithili",
-  "Makassar",
-  "Malagasy",
-  "Malay",
-  "Pangasinan",
-  "Papiamento",
-  "Pashto",
-  "Persian",
-  "Polish",
-  "Portuguese (Brazil)",
-  "Portuguese (Portugal)",
-  "Punjabi (Gurmukhi)",
-  "Punjabi (Shahmukhi)",
-  "Quechua",
-  "Q’eqchi’",
-  "Romani",
-  "Romanian",
-  "Tajik",
-  "Tamazight",
-  "Tamazight (Tifinagh)",
-  "Tamil",
-  "Tatar",
-  "Telugu",
-  "Tetum",
-  "Thai",
-  "Tibetan",
-  "Tigrinya",
-  "Tiv",
-  "Tok Pisin",
-  "Tongan",
+  "Japanese",
+  "Korean",
+  "Portuguese",
+  "Russian",
+  "Spanish",
+  "Turkish",
 ];

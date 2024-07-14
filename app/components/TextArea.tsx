@@ -19,16 +19,16 @@ export default function TextArea(props: {
   setActiveTranslation: React.Dispatch<
     React.SetStateAction<SentenceItem[] | null>
   >;
-  handleTranslate: (input: string) => void;
   innerRef: React.RefObject<HTMLDivElement>;
+  setInputText: React.Dispatch<React.SetStateAction<string | undefined>>;
   setCharCount: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const { translationData } = useTranslationContext();
   const {
     activeTranslation,
     setActiveTranslation,
-    handleTranslate,
     innerRef,
+    setInputText,
     setCharCount,
   } = props;
   const [position, setPosition] = useState<{ x: number; y: number }>({
@@ -48,7 +48,7 @@ export default function TextArea(props: {
     focussedRef.current = false; // Should be in a separate handler
     const current_text = document.querySelector(".editable")?.textContent;
     if (!current_text) return;
-    handleTranslate(current_text);
+    setInputText(current_text);
   };
 
   useEffect(() => {
@@ -79,8 +79,10 @@ export default function TextArea(props: {
   }, [translationData, activeTranslation]); // Dependency array, effect runs when translationData changes
 
   useEffect(() => {
+    alert("Selection change listener added");
     const selectionChangeHandler = (event: Event) => {
       event.preventDefault();
+      console.log("Selection changed");
       handleSelectionChange(setActiveTranslation, setPosition, selectingRef);
     };
     document.addEventListener("selectionchange", selectionChangeHandler);

@@ -24,6 +24,7 @@
     "react": "^18",
     "react-contenteditable": "~3.3.7",
     "react-dom": "^18",
+    "react-select": "^5.8.0",
     "sanitize-html": "~2.13.0",
     "sbd": "^1.0.19",
     "server-only": "^0.0.1"
