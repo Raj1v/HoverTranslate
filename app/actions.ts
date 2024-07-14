@@ -84,8 +84,25 @@ const checkLanguage = async (input: string): Promise<string> => {
     return result.language;
 }
 
-
 export const checkChange = async (input: string, prevInput: string): Promise<boolean> => {
+    // Normalize text by removing punctuation, converting to lowercase, and trimming whitespace
+    function normalize(text : string) {
+        return text
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "") // Remove punctuation
+            .replace(/\s+/g, " ") // Replace multiple whitespace with a single space
+            .toLowerCase() // Convert to lowercase
+            .trim(); // Trim whitespace from start and end
+    }
+
+    // Normalize both texts
+    const normalizedText1 = normalize(input);
+    const normalizedText2 = normalize(prevInput);
+
+    // Compare normalized texts
+    return normalizedText1 !== normalizedText2;
+}
+
+export const checkChangeLLM = async (input: string, prevInput: string): Promise<boolean> => {
     const instructions = `
     Has the input text change since the last translation?
 

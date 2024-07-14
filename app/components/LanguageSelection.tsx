@@ -9,7 +9,9 @@ export default function LanguageSelection(props: {
 }) {
   const { sourceLanguage, targetLaguage, setTargetLanguage, isLoading } = props;
   return (
-    <div className="mt-10 mb-1 flex items-center justify-center flex-row space-x-4">
+    <div
+      className={`mt-10 mb-1 flex items-center justify-center flex-row space-x-4`}
+    >
       <div className="flex-1 flex justify-center">
         <LanguageDropdown language={sourceLanguage} active={false} />
       </div>

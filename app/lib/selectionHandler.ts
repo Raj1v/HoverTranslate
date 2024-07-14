@@ -14,6 +14,8 @@ const handleSelectionChange = (
 
   // Check if the selection is empty
     if (!activeSelection || activeSelection.toString() === "") {
+      console.log("clearing hover");
+
       selectingRef.current = false;
       setActiveTranslation(null);
       return;
@@ -68,6 +70,7 @@ const handleSelectionChange = (
       const setenceItem = htmlElementToSentenceItem(span);
       selectedSentenceItems.push(setenceItem)
     });
+    console.log("clearing hover");
 
     setActiveTranslation(selectedSentenceItems);
   }

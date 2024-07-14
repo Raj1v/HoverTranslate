@@ -5,7 +5,7 @@ import { TranslationData, SentenceItem } from "@/app/lib/types";
 import { getTranslation, getSampleSentence, checkChange } from "@/app/actions";
 import LanguageSelection from "@/app/components/LanguageSelection";
 import WordCounter from "@/app/components/WordCounter";
-import FeedbackButtons from "@/app/components/FeedbackForm";
+import DetailsBox from "@/app/components/DetailsBox";
 
 export default function Main(props: { className?: string }) {
   const [targetLaguage, setTargetLanguage] = useState<string>("English");
@@ -61,27 +61,35 @@ export default function Main(props: { className?: string }) {
       <main
         className={`flex min-h-screen flex-col items-center justify-normal ${props.className}`}
       >
-        <h1 className="text-4xl font-bold">
-          <span>Hover</span>
-          <span className="italic bg-slate-900 text-white pr-2 ml-1">
-            Translate
-          </span>
-        </h1>
-        <LanguageSelection
-          sourceLanguage={translationData?.source_language || ""}
-          targetLaguage={targetLaguage}
-          setTargetLanguage={setTargetLanguage}
-          isLoading={loading}
-        />
-        <div className="w-full">
+        <header>
+          <h1 className="text-4xl font-bold">
+            <span>Hover</span>
+            <span className="italic bg-slate-700 text-white pr-2 ml-1">
+              Translate
+            </span>
+          </h1>
+        </header>
+        <section className="w-full flex items-center justify-center relative text-center mt-5 mb-8">
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <LanguageSelection
+              sourceLanguage={translationData?.source_language || ""}
+              targetLaguage={targetLaguage}
+              setTargetLanguage={setTargetLanguage}
+              isLoading={loading}
+            />
+          </div>
+        </section>
+
+        <div className="w-full flex mt-5">
           <TextArea
-            className="mt-5"
+            className="flex-grow min-w-0"
             activeTranslation={activeTranslation}
             setActiveTranslation={setActiveTranslation}
             handleTranslate={handleTranslate}
             innerRef={textboxRef}
             setCharCount={setCharCount}
           />
+          <DetailsBox activeTranslation={activeTranslation} />
         </div>
         <div className="w-full flex justify-end">
           <WordCounter textboxRef={textboxRef} charCount={charCount} />

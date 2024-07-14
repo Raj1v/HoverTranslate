@@ -8,6 +8,8 @@ import { sampleData, TranslationData, SentenceItem } from "@/app/lib/types";
 import handleSelectionChange from "@/app/lib/selectionHandler";
 import { handleStartHover, handleEndHover } from "@/app/lib/hoverHandler";
 import { useTranslationContext } from "@/app/TranslationContext";
+import useTranslation from "@/app/lib/useTranslation";
+import sanitizeHtml from "sanitize-html";
 // @ts-ignore
 import ContentEditable from "react-contenteditable";
 
@@ -34,16 +36,16 @@ export default function TextArea(props: {
     y: 0,
   });
   const selectingRef = useRef<boolean>(false);
+  const focussedRef = useRef<boolean>(false);
   const currentHover = useRef<string | null>(null);
   const [innerHTML, setInnerHTML] = useState<string>("");
 
   const className = clsx("editable", "w-full h-80", props.className);
 
-  const translation = activeTranslation
-    ?.map((element) => element.translation)
-    .join(" ");
+  const translation = useTranslation(activeTranslation);
 
   const reloadTranslation = () => {
+    focussedRef.current = false; // Should be in a separate handler
     const current_text = document.querySelector(".editable")?.textContent;
     if (!current_text) return;
     handleTranslate(current_text);
@@ -74,7 +76,7 @@ export default function TextArea(props: {
     } else {
       setInnerHTML("Loading...");
     }
-  }, [translationData]); // Dependency array, effect runs when translationData changes
+  }, [translationData, activeTranslation]); // Dependency array, effect runs when translationData changes
 
   useEffect(() => {
     const selectionChangeHandler = (event: Event) => {
@@ -89,6 +91,7 @@ export default function TextArea(props: {
   }, []);
 
   const handleMouseOver = (event: React.MouseEvent<HTMLElement>) => {
+    console.log("hovering");
     const target = event.target as HTMLElement;
     if (target.matches("span.tooltip")) {
       event.preventDefault();
@@ -107,16 +110,38 @@ export default function TextArea(props: {
     const target = event.target as HTMLElement;
     if (target.matches("span.tooltip")) {
       event.preventDefault();
-      handleEndHover(event, selectingRef, setActiveTranslation, currentHover);
+      handleEndHover(
+        event,
+        selectingRef,
+        focussedRef,
+        setActiveTranslation,
+        currentHover
+      );
     }
   };
+
+  const sanitizeConf = {
+    allowedTags: ["p", "br", "span"],
+    allowedAttributes: {
+      "*": ["data-*", "class"], // List all event handlers you want to allow
+    },
+  };
+
+  // useEffect(() => {
+  //   // Sanitize on html change
+  //   console.log("Sanitizing");
+  //   const sanitizedHTML = sanitizeHtml(innerHTML, sanitizeConf);
+  //   if (sanitizedHTML !== innerHTML) {
+  //     setInnerHTML(sanitizedHTML);
+  //   }
+  // }, [innerHTML]);
 
   return (
     <>
       <TranslationBox translation={translation} position={position} />
       <ContentEditable
         html={innerHTML}
-        className={`${className} border rounded-lg text-2xl pt-2 px-4`}
+        className={`${className} border rounded-lg text-2xl pt-2 px-4 overflow-auto`}
         onBlur={reloadTranslation}
         onChange={(event) => {
           const target = event.target as HTMLInputElement;
@@ -124,6 +149,9 @@ export default function TextArea(props: {
           setInnerHTML(target.value);
         }}
         innerRef={innerRef}
+        onFocus={() => {
+          focussedRef.current = true;
+        }}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       />

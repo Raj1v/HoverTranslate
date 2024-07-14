@@ -43,13 +43,16 @@ export const handleStartHover = (
 export const handleEndHover = (
     event: React.MouseEvent<HTMLElement>,
     selectingRef: React.MutableRefObject<boolean>,
+    focussedRef: React.MutableRefObject<boolean>,
     setActiveTranslation: Dispatch<SetStateAction<SentenceItem[] | null>>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
     if (selectingRef.current) return; // Selecting takes precedence over hovering
+    if (focussedRef.current) return; // Do not clear hover if focussed
     const target = event.target as HTMLElement;
     const sentenceItemId = target.getAttribute("data-sentence-item-id");
     if (currentHoverRef.current === sentenceItemId) {
+        console.log("clearing hover");
         setActiveTranslation([]);
         currentHoverRef.current = null;
     }
