@@ -1,10 +1,14 @@
-import { SentenceItem } from "@/app/lib/types";
+import { SentenceItem, ActiveTranslation } from "@/app/lib/types";
 import useTranslation from "@/app/lib/useTranslation";
+import { useTranslationContext } from "@/app/TranslationContext";
 
 // Debug box compunent
-const DetailsBox = (props: { activeTranslation: SentenceItem[] | null }) => {
+const DetailsBox = (props: { activeTranslation: ActiveTranslation }) => {
   const { activeTranslation } = props;
-  const translation = useTranslation(activeTranslation);
+  const { translationData } = useTranslationContext();
+  const { translation, sentenceItems } = translationData
+    ? useTranslation(activeTranslation, translationData)
+    : { translation: null, sentenceItems: null };
   return (
     <div className="w-3/12 h-80 flex-shrink-0 px-5">
       <span
@@ -12,7 +16,7 @@ const DetailsBox = (props: { activeTranslation: SentenceItem[] | null }) => {
               text-xl w-full text-center
               bg-slate-700 text-gray-100 "
       >
-        {activeTranslation?.map((element) => element.original).join(" ") ||
+        {sentenceItems?.map((element) => element.original).join(" ") ||
           "Start Hovering 🚀"}
       </span>
       <span className="block bg-slate-400 text-xl text-center mb-5">

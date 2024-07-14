@@ -1,10 +1,14 @@
 "use client";
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { renderToString } from "react-dom/server";
 import clsx, { ClassArray, ClassDictionary } from "clsx";
-import SentenceItemWrapper from "../lib/WordWrapper";
+import SentenceItemWrapper from "./SentenceItemWrapper";
 import TranslationBox from "@/app/components/TranslationBox";
-import { sampleData, TranslationData, SentenceItem } from "@/app/lib/types";
+import {
+  TranslationData,
+  SentenceItem,
+  ActiveTranslation,
+} from "@/app/lib/types";
 import handleSelectionChange from "@/app/lib/selectionHandler";
 import { handleStartHover, handleEndHover } from "@/app/lib/hoverHandler";
 import { useTranslationContext } from "@/app/TranslationContext";
@@ -15,10 +19,8 @@ import ContentEditable from "react-contenteditable";
 
 export default function TextArea(props: {
   className: string;
-  activeTranslation: SentenceItem[] | null;
-  setActiveTranslation: React.Dispatch<
-    React.SetStateAction<SentenceItem[] | null>
-  >;
+  activeTranslation: ActiveTranslation;
+  setActiveTranslation: React.Dispatch<React.SetStateAction<ActiveTranslation>>;
   innerRef: React.RefObject<HTMLDivElement>;
   setInputText: React.Dispatch<React.SetStateAction<string | undefined>>;
   setCharCount: React.Dispatch<React.SetStateAction<number>>;
@@ -42,7 +44,10 @@ export default function TextArea(props: {
 
   const className = clsx("editable", "w-full h-80", props.className);
 
-  const translation = useTranslation(activeTranslation);
+  const { translation, sentenceItems } = useTranslation(
+    activeTranslation,
+    translationData!
+  );
 
   const reloadTranslation = () => {
     focussedRef.current = false; // Should be in a separate handler
@@ -61,6 +66,13 @@ export default function TextArea(props: {
               <SentenceItemWrapper
                 sentenceId={sentenceId}
                 sentenceItemId={index.toString()}
+                active={
+                  activeTranslation?.some(
+                    (item) =>
+                      item.sentenceId === sentenceId &&
+                      item.sentenceItemId === index
+                  ) || false
+                }
               >
                 {sentenceItem}
               </SentenceItemWrapper>

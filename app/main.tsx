@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { TranslationContext } from "@/app/TranslationContext";
 import TextArea from "@/app/components/TextArea";
-import { TranslationData, SentenceItem } from "@/app/lib/types";
+import { TranslationData, ActiveTranslation } from "@/app/lib/types";
 import { getTranslation, getSampleSentence, checkChange } from "@/app/actions";
 import LanguageSelection from "@/app/components/LanguageSelection";
 import WordCounter from "@/app/components/WordCounter";
@@ -12,9 +12,8 @@ export default function Main(props: { className?: string }) {
   const [translationData, setTranslationData] =
     useState<TranslationData | null>(null);
 
-  const [activeTranslation, setActiveTranslation] = useState<
-    SentenceItem[] | null
-  >(null);
+  const [activeTranslation, setActiveTranslation] =
+    useState<ActiveTranslation>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
   const prevInput = useRef<{
@@ -28,24 +27,6 @@ export default function Main(props: { className?: string }) {
   const textboxRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState<string>();
   const [charCount, setCharCount] = useState<number>(0);
-
-  // const handleTranslate = async (input: string) => {
-  //   if (prevInput.current != "") {
-  //     const inputChanged = await checkChange(input, prevInput.current);
-  //     if (!inputChanged) return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     const translationData = await getTranslation(input, targetLanguage);
-  //     prevInput.current = input;
-  //     setTranslationData(translationData);
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     const translate = async () => {
