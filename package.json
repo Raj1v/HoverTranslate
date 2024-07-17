@@ -9,13 +9,20 @@
     "lint": "pnpm next lint"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.6.4",
     "@floating-ui/react-dom": "^2.1.1",
     "@headlessui/react": "^2.1.2",
     "@langchain/core": "^0.2.14",
     "@langchain/openai": "^0.2.1",
+    "@radix-ui/react-popover": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
     "animate.css": "^4.1.1",
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "clx": "^1.0.0",
+    "firebase": "^10.12.3",
+    "firebase-admin": "^12.2.0",
     "langchain": "^0.2.8",
     "langsmith": "^0.1.36",
     "lucide-react": "^0.400.0",
@@ -27,7 +34,9 @@
     "react-select": "^5.8.0",
     "sanitize-html": "~2.13.0",
     "sbd": "^1.0.19",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",

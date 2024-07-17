@@ -3,7 +3,7 @@ import FeedbackButtons from "@/app/components/FeedbackForm";
 const Footer = (props: { className?: string }) => {
   return (
     <footer
-      className={`w-full h-20 border-t -mt-20 pt-2 pb-3 ${props.className}`}
+      className={`w-full h-20 border-t -mt-20 pt-3 pb-3 ${props.className}`}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between text-center">
         <Credits className="absolute left-1/2 transform -translate-x-1/2" />

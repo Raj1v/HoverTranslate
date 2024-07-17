@@ -3,11 +3,11 @@ import { translateSentence } from "@/app/lib/fetch-translation";
 import { TranslationData } from "@/app/lib/types";
 import { traceable } from "langsmith/traceable";
 import { ChatOpenAI } from "@langchain/openai";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import {
   HumanMessagePromptTemplate
 } from "@langchain/core/prompts";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
+import { db } from "@/app/lib/firebase";
 
 //@ts-ignore
 import SBD from 'sbd';
@@ -133,3 +133,19 @@ export const checkChangeLLM = async (input: string, prevInput: string): Promise<
     }
     return result.changed;
 }
+
+
+export const recordFeedback = async (
+    positive: boolean,
+  ): Promise<void> => {
+    try {
+      const data = {
+        feedback: positive ? "positive" : "negative",
+        timestamp: new Date()
+    };
+      const res = await db.collection("feedback").add(data);
+      console.log("Document written with ID: ", res.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
