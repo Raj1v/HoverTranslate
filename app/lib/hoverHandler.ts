@@ -51,8 +51,8 @@ export const handleEndHover = (
     setActiveTranslation: Dispatch<SetStateAction<ActiveTranslation>>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
+    console.log("end hover");
     if (selectingRef.current) return; // Selecting takes precedence over hovering
-    if (focussedRef.current) return; // Do not clear hover if focussed
     const target = event.target as HTMLElement;
     const sentenceItemId = target.getAttribute("data-sentence-item-id");
     if (currentHoverRef.current === sentenceItemId) {

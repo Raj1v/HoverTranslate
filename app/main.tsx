@@ -50,6 +50,7 @@ export default function Main(props: { className?: string }) {
         const translationData = await getTranslation(inputText, targetLanguage);
         prevInput.current.input = inputText;
         prevInput.current.targetLanguage = targetLanguage; // Store the current target language
+
         setTranslationData(translationData);
       } catch (e) {
         console.error(e);
@@ -110,7 +111,7 @@ export default function Main(props: { className?: string }) {
             setInputText={setInputText}
             setCharCount={setCharCount}
           />
-          <DetailsBox activeTranslation={activeTranslation} />
+          {/* <DetailsBox activeTranslation={activeTranslation} /> */}
         </div>
         <div className="w-full flex justify-end">
           <WordCounter textboxRef={textboxRef} charCount={charCount} />

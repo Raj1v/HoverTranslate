@@ -14,10 +14,11 @@ const handleSelectionChange = (
 
   // Check if the selection is empty
     if (!activeSelection || activeSelection.toString() === "") {
-      console.log("clearing hover");
-
-      selectingRef.current = false;
-      setActiveTranslation(null);
+      if (selectingRef.current)
+      {
+        selectingRef.current = false;
+        setActiveTranslation(null);
+      }
       return;
     }
 

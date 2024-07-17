@@ -1,11 +1,14 @@
-import { initializeApp, applicationDefault, getApp } from "firebase-admin/app";
+import { initializeApp, applicationDefault, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+let app;
 
-let app = getApp();
-if (!app) {
+if (getApps().length === 0) {
     app = initializeApp({
         credential: applicationDefault()
     });
+}
+else{
+    app = getApps()[0];
 }
 
 const db = getFirestore(app);

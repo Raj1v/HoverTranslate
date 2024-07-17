@@ -17,6 +17,22 @@ import sanitizeHtml from "sanitize-html";
 // @ts-ignore
 import ContentEditable from "react-contenteditable";
 
+function debounce(func: (...args: any[]) => void, wait: number): () => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return function executedFunction(...args: any[]): void {
+    const later = () => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+        func(...args);
+      }
+    };
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
+}
+
 export default function TextArea(props: {
   className: string;
   activeTranslation: ActiveTranslation;
@@ -80,7 +96,8 @@ export default function TextArea(props: {
             </React.Fragment>
           )
         );
-        sentence_html.push(<span>. </span>);
+
+        sentence_html.push(<span>&nbsp;</span>);
         content += renderToString(sentence_html);
       });
 
@@ -91,11 +108,11 @@ export default function TextArea(props: {
   }, [translationData, activeTranslation]); // Dependency array, effect runs when translationData changes
 
   useEffect(() => {
-    alert("Selection change listener added");
+    return;
     const selectionChangeHandler = (event: Event) => {
       event.preventDefault();
       console.log("Selection changed");
-      handleSelectionChange(setActiveTranslation, setPosition, selectingRef);
+      //  handleSelectionChange(setActiveTranslation, setPosition, selectingRef);
     };
     document.addEventListener("selectionchange", selectionChangeHandler);
 
@@ -105,7 +122,6 @@ export default function TextArea(props: {
   }, []);
 
   const handleMouseOver = (event: React.MouseEvent<HTMLElement>) => {
-    console.log("hovering");
     const target = event.target as HTMLElement;
     if (target.matches("span.tooltip")) {
       event.preventDefault();
@@ -122,6 +138,8 @@ export default function TextArea(props: {
 
   const handleMouseOut = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
+    console.log("Mouse out");
+
     if (target.matches("span.tooltip")) {
       event.preventDefault();
       handleEndHover(
@@ -166,7 +184,7 @@ export default function TextArea(props: {
         onFocus={() => {
           focussedRef.current = true;
         }}
-        onMouseOver={handleMouseOver}
+        onMouseOver={debounce(handleMouseOver, 5)}
         onMouseOut={handleMouseOut}
       />
       {/* <p>Translation: {translation}</p>

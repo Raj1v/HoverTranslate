@@ -6,9 +6,10 @@ import { useTranslationContext } from "@/app/TranslationContext";
 const DetailsBox = (props: { activeTranslation: ActiveTranslation }) => {
   const { activeTranslation } = props;
   const { translationData } = useTranslationContext();
-  const { translation, sentenceItems } = translationData
-    ? useTranslation(activeTranslation, translationData)
-    : { translation: null, sentenceItems: null };
+  const { translation, sentenceItems } = useTranslation(
+    activeTranslation,
+    translationData
+  );
   return (
     <div className="w-3/12 h-80 flex-shrink-0 px-5">
       <span

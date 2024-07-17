@@ -41,6 +41,8 @@ Guidelines:
 
 - The sentence should be broken down into individual word/phrase pairs with their corresponding translations.
 
+- Always respect interpunction. Include any interpunction from the original text in the sentence items.
+
 - A sentence item is a pair of original word/phrase and its translation.
 
 - A sentence iteem combines words/phrases that are closely related to each other.

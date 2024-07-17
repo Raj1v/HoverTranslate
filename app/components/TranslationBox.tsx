@@ -32,7 +32,7 @@ const TranslationBox = (props: {
   }, [translation]);
 
   return (
-    <div role="dialog" aria-labelledby="share" aria-haspopup="dialog">
+    <div>
       <p
         className={`tooltipBox`}
         ref={ref}
