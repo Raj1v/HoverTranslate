@@ -89,7 +89,7 @@ export default function TextArea(props: {
       activeSentenceItem.wordIds.forEach((wordId) => {
         const wordSpan = innerRef.current?.querySelector(`span[data-sentence-id="${sentenceId}"][data-word-id="${wordId}"]`);
         if(wordSpan) {
-          wordSpan.classList.add("bg-slate-700", "text-gray-100", "italic");
+          wordSpan.classList.add("bg-slate-700", "text-gray-100");
         }
       });
     }

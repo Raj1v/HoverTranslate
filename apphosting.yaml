@@ -1,0 +1,8 @@
+# Environment variables and secrets
+env:
+  - variable: OPENAI_API_KEY
+    secret: OPENAI_API_KEY
+  - variable: LANGCHAIN_API_KEY
+    secret: LANGCHAIN_API_KEY
+  - variable: LANGCHAIN_PROJECT
+    secret: LANGCHAIN_PROJECT
