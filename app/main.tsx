@@ -1,16 +1,26 @@
 import { useEffect, useState, useRef } from "react";
 import { TranslationContext } from "@/app/TranslationContext";
 import TextArea from "@/app/components/TextArea";
-import { TranslationData, ActiveTranslation } from "@/app/lib/types";
-import { getTranslation, getSampleSentence, checkChange } from "@/app/actions";
+import {
+  TranslationData,
+  ActiveTranslation,
+  Sentence,
+  TranslateSentenceInput,
+} from "@/app/lib/types";
+import { getTranslation, getSampleSentence } from "@/app/actions";
+import { translateSentence } from "@/app/lib/fetch-translation";
 import LanguageSelection from "@/app/components/LanguageSelection";
 import WordCounter from "@/app/components/WordCounter";
+import useTranslation from "@/app/lib/useTranslation";
 import DetailsBox from "@/app/components/DetailsBox";
 
 export default function Main(props: { className?: string }) {
   const [targetLanguage, setTargetLanguage] = useState<string>("English");
-  const [translationData, setTranslationData] =
-    useState<TranslationData | null>(null);
+  const [translationData, setTranslationData] = useState<TranslationData>({
+    source_language: "",
+    target_language: "",
+    sentences: [],
+  });
 
   const [activeTranslation, setActiveTranslation] =
     useState<ActiveTranslation>(null);
@@ -28,30 +38,51 @@ export default function Main(props: { className?: string }) {
   const [inputText, setInputText] = useState<string>();
   const [charCount, setCharCount] = useState<number>(0);
 
+  const { translation, sentenceItem } = useTranslation(
+    activeTranslation,
+    translationData
+  );
+
   useEffect(() => {
     const translate = async () => {
-      if (!inputText || !targetLanguage) return;
-      if (
-        targetLanguage === prevInput.current?.targetLanguage &&
-        prevInput.current?.input !== undefined
-      ) {
-        const inputChanged = await checkChange(
-          inputText,
-          prevInput.current.input
-        );
-        if (!inputChanged) {
-          return;
-        }
-      }
+      if (!targetLanguage) return;
+      if (!activeTranslation) return;
 
       setLoading(true);
 
       try {
-        const translationData = await getTranslation(inputText, targetLanguage);
-        prevInput.current.input = inputText;
-        prevInput.current.targetLanguage = targetLanguage; // Store the current target language
+        const sentenceId = activeTranslation[0].sentenceId;
+        const sentenceSpan = textboxRef.current?.querySelector(`span.sentence[data-sentence-id="${sentenceId}"]`);
+        const input : TranslateSentenceInput = {
+          original: sentenceSpan?.textContent ?? "",
+          words: Array.from(sentenceSpan?.querySelectorAll("span.tooltip") ?? []).map((element, index) => {
+            const wordId = element.getAttribute("data-word-id");
+            if (!wordId) throw new Error("No word id for a word in the sentence to translate");
 
-        setTranslationData(translationData);
+            return {
+              word: element.textContent ?? "",
+              id: parseInt(wordId),
+            };
+          }),
+        }
+
+        const sentence : Sentence = await translateSentence(input, targetLanguage);
+
+        setTranslationData((prevData) => {
+          const updatedSentences = {
+            ...prevData.sentences,
+            [activeTranslation[0].sentenceId]: sentence,
+          };
+
+          return {
+            ...prevData,
+            sentences: updatedSentences,
+          };
+        });
+        
+
+        
+        
       } catch (e) {
         console.error(e);
       } finally {
@@ -59,8 +90,10 @@ export default function Main(props: { className?: string }) {
       }
     };
 
-    translate();
-  }, [inputText, targetLanguage]);
+    if (translation === false) {
+      translate();
+    }
+  }, [translation]);
 
   const sampleLoaded = useRef(false);
 
@@ -94,7 +127,6 @@ export default function Main(props: { className?: string }) {
         <section className="w-full flex items-center justify-center relative text-center mt-5 mb-8">
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <LanguageSelection
-              sourceLanguage={translationData?.source_language || ""}
               targetLanguage={targetLanguage}
               setTargetLanguage={setTargetLanguage}
               isLoading={loading}
@@ -107,8 +139,8 @@ export default function Main(props: { className?: string }) {
             className="flex-grow min-w-0"
             activeTranslation={activeTranslation}
             setActiveTranslation={setActiveTranslation}
+            translation={translation}
             innerRef={textboxRef}
-            setInputText={setInputText}
             setCharCount={setCharCount}
           />
           {/* <DetailsBox activeTranslation={activeTranslation} /> */}

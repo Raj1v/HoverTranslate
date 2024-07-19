@@ -1,58 +1,20 @@
-"server-only";
+"use server";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import {
-  ChatMessagePromptTemplate,
   ChatPromptTemplate,
-  PromptTemplate,
+  HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from "@langchain/core/prompts";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
-import { TranslationData, Sentence, SentenceItem } from "@/app/lib/types";
+import { Sentence, TranslateSentenceInput, SentenceItem } from "@/app/lib/types";
+import { instruction } from "@/app/lib/prompt";
+
 
 export async function translateSentence(
-  original: string,
+  input: TranslateSentenceInput,
   target_language: string
 ): Promise<Sentence> {
-  const instruction = `
-    Translate the following text into the specified target language and provide the output in JSON format as described below. Each sentence in the source text should be broken down into individual word/phrase pairs with their corresponding translations.
-    
-    ### Input:
-    1. **Target Language**: Specify the target language.
-    2. **Text to Translate**: Provide the text that needs to be translated.
-    
-    ### Output:
-    The output should be a JSON object with the following structure:
-
-    
-    \`\`\`json
-    {
-      "source_language": "source_language",
-      "target_language": "target_language",
-      "sentenceItems": [
-        { "original": "word/phrase_from_source_text", "translation": "translated_word/phrase" },
-        { "original": "word/phrase_from_source_text", "translation": "translated_word/phrase" },
-        ...
-      ]
-    }
-    \`\`\`
-    
-Guidelines:
-
-- The sentence should be broken down into individual word/phrase pairs with their corresponding translations.
-
-- Always respect interpunction. Include any interpunction from the original text in the sentence items.
-
-- A sentence item is a pair of original word/phrase and its translation.
-
-- A sentence iteem combines words/phrases that are closely related to each other.
-
-a) For example, in the sentence "I am a student", "I" and "am" should be in the same sentence item.
-
-b) In the sentence "I am a student", "a" and "student" should be in the same sentence item.
-
-c) Prepositions are usually part of the phrase that follows them. For example, in the sentence "I am in the classroom", "in" and "the classroom" should be in the same sentence item.
-    `;
   const llm: ChatOpenAI = new ChatOpenAI({
     model: "gpt-4o",
     modelKwargs: { response_format: { type: "json_object" } },
@@ -60,10 +22,13 @@ c) Prepositions are usually part of the phrase that follows them. For example, i
 
   const messages = [
     new SystemMessage(instruction),
-    SystemMessagePromptTemplate.fromTemplate(
+    HumanMessagePromptTemplate.fromTemplate(
       "Target Language: {target_language}"
     ),
-    SystemMessagePromptTemplate.fromTemplate("Text to Translate: {original}")
+    HumanMessagePromptTemplate.fromTemplate(`Text to Translate: {original}
+      Word-ID mapping:
+      {word_mapping}
+      `)
   ];
 
   const prompt = ChatPromptTemplate.fromMessages(messages);
@@ -73,25 +38,30 @@ c) Prepositions are usually part of the phrase that follows them. For example, i
   const chain = prompt.pipe(llm).pipe(parser);
   const result = await chain.invoke({
     target_language: target_language,
-    original: original,
+    original: input.original,
+    word_mapping: formatTranslateSentenceInput(input),
   });
   return await parseTranslationResult(result);
 }
 
+function formatTranslateSentenceInput(input: TranslateSentenceInput) {
+  const { words } = input;
+  const formattedWords = words.map(wordObj => `{ "word": "${wordObj.word}", "id": ${wordObj.id} }`).join(',\n  ');
+  return `[
+  ${formattedWords}
+  ]`
+}
 
 async function parseTranslationResult(result: any): Promise<Sentence> {
   // Ensure the result has the expected structure
   if (
-    result.source_language &&
-    result.target_language &&
-    Array.isArray(result.sentenceItems)
+    Array.isArray(result.wordGroups)
   ) {
-    return {
-      sentenceItems: result.sentenceItems.map((item: any) => ({
-        original: item.original,
-        translation: item.translation,
-      })),
-    };
+    const sentenceItems: SentenceItem[] = result.wordGroups.map((group: any) => ({
+      wordIds: group.wordIds,
+      translation: group.translation,
+    }));
+    return { sentenceItems };
   } else {
     throw new Error("Unexpected translation result format");
   }

@@ -1,38 +1,10 @@
 "use server";
-import { translateSentence } from "@/app/lib/fetch-translation";
-import { TranslationData } from "@/app/lib/types";
-import { traceable } from "langsmith/traceable";
 import { ChatOpenAI } from "@langchain/openai";
 import {
   HumanMessagePromptTemplate
 } from "@langchain/core/prompts";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import { db } from "@/app/lib/firebase";
-
-//@ts-ignore
-import SBD from 'sbd';
-
-export const getTranslation = traceable( async (original: string, targetLanguage: string): Promise<TranslationData> =>
-    {
-    const sentences : string[] = SBD.sentences(original);
-    try {
-        const source_language = await checkLanguage(original);
-        const result = await Promise.all(sentences.map(async (sentence) => {
-            return await translateSentence(sentence, targetLanguage);
-        }))
-
-        const translationData : TranslationData= 
-        {
-            sentences: result,
-            source_language: source_language,
-            target_language: targetLanguage
-        }
-        console.log(result)
-        return translationData ;
-    } catch (error) {
-        throw error
-    }
-},   { name: "Get Translation" })
 
 const sample_sentences : string[] = [
     "Je parle à mon chien en français pour qu'il devienne bilingue.", // French: "I speak to my dog in French so he becomes bilingual."
@@ -57,7 +29,7 @@ export async function getSampleSentence(): Promise<string> {
     return sentence;
 }
 
-const checkLanguage = async (input: string): Promise<string> => {
+export const checkLanguage = async (input: string): Promise<string> => {
     const instructions = `
     What language is the input text in?
 

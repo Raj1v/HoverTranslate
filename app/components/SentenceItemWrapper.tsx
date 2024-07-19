@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import "animate.css";
-import "@/app/styles/tooltips.css";
 import { SentenceItem } from "../lib/types";
 
 interface SentenceItemWrapperProps {

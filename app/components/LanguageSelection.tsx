@@ -1,27 +1,41 @@
 import { Button } from "@headlessui/react";
 import { ChevronDown, CircleArrowRight, LoaderCircle } from "lucide-react";
+import { useTranslationContext } from "../TranslationContext";
+import { useEffect } from "react";
 import Select from "react-select";
 
 export default function LanguageSelection(props: {
-  sourceLanguage: string;
   targetLanguage: string;
   setTargetLanguage: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
 }) {
-  const { sourceLanguage, targetLanguage, setTargetLanguage, isLoading } =
-    props;
+
+  const { translationData } = useTranslationContext();
+
+  const { targetLanguage, setTargetLanguage, isLoading } = props;
   return (
     <div
       className={`mt-10 mb-1 flex items-center justify-center flex-row space-x-4`}
     >
       <div className="flex-1 flex justify-center">
-        <LanguageDropdown language={sourceLanguage} active={false} />
+        <Button
+          className="w-40 h-10 border rounded py-2 px-4 
+        text-lg text-neutral-800
+        flex items-center justify-center"
+        disabled={true}
+        >
+          {translationData.source_language === false ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            translationData.source_language
+          )}
+        </Button>
       </div>
       <div className="flex items-center justify-center">
         {isLoading ? (
-          <LoaderCircle className="animate-spin" /> // This will show when isLoading is true
+          <LoaderCircle className="animate-spin" />
         ) : (
-          <CircleArrowRight /> // This will show when isLoading is false
+          <CircleArrowRight />
         )}{" "}
       </div>
       <div className="flex-1 flex justify-center">

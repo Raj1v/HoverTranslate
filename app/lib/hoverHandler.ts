@@ -1,36 +1,38 @@
 import { Dispatch, SetStateAction } from "react";
 import { SentenceItem, TranslationData, ActiveTranslation } from "@/app/lib/types";
 
+const getSpanData = (target: Element) => {
+  const wordId = target.getAttribute("data-word-id");
+  const sentenceId = target.getAttribute("data-sentence-id");
+
+  if (!wordId) {
+    throw new Error("No word ID found on span");
+  }
+  if (!sentenceId) {
+    throw new Error("No sentence  ID found on span");
+  }
+
+  return {
+    sentenceId: parseInt(sentenceId),
+    wordId: parseInt(wordId),
+  };
+}
+
 export const handleStartHover = (
     event: React.MouseEvent<HTMLElement>,
-    translationData: TranslationData | null,
     setActiveTranslation: Dispatch<SetStateAction<ActiveTranslation>>,
     setPosition: (value: SetStateAction<{ x: number; y: number }>) => void,
     selectingRef: React.MutableRefObject<boolean>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
-    console.log("hovering");
     if (selectingRef.current) return; // Selecting takes precedence over hovering
-    const target = event.target as Element;
-    console.log(target);
-    const sentenceItemId = target.getAttribute("data-sentence-item-id");
-    const sentenceId = target.getAttribute("data-sentence-id");
-
-    if (!sentenceItemId) {
-      throw new Error("No sentence item ID found on span");
-    }
-    if (!sentenceId) {
-      throw new Error("No sentence  ID found on span");
-    }
+    const target = event.target as HTMLElement;
+    const { sentenceId, wordId } = getSpanData(target);
 
     const sentenceItem = {
-      sentenceId: parseInt(sentenceId),
-      sentenceItemId: parseInt(sentenceItemId),
+      sentenceId: sentenceId,
+      wordId: wordId,
     };
-
-    if (!sentenceItem) {
-      throw new Error("No sentence item found for ID");
-    }
 
     setActiveTranslation([sentenceItem]);
 
@@ -40,7 +42,7 @@ export const handleStartHover = (
         target.getBoundingClientRect().width / 2,
       y: target.getBoundingClientRect().top,
     });
-    currentHoverRef.current = sentenceItemId;
+    currentHoverRef.current = sentenceId + "/" + wordId;
 }
 
 
@@ -51,11 +53,10 @@ export const handleEndHover = (
     setActiveTranslation: Dispatch<SetStateAction<ActiveTranslation>>,
     currentHoverRef: React.MutableRefObject<string | null>
   ) => {
-    console.log("end hover");
     if (selectingRef.current) return; // Selecting takes precedence over hovering
     const target = event.target as HTMLElement;
-    const sentenceItemId = target.getAttribute("data-sentence-item-id");
-    if (currentHoverRef.current === sentenceItemId) {
+    const { sentenceId, wordId } = getSpanData(target);
+    if (currentHoverRef.current === sentenceId + "/" + wordId) {
         console.log("clearing hover");
         setActiveTranslation(null);
         currentHoverRef.current = null;

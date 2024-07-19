@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
+import { LoaderCircle } from "lucide-react";
 import "@/app/styles/tooltips.css";
 
 const TranslationBox = (props: {
-  translation: string | undefined;
+  translation: string | boolean | null;
   position: { x: number; y: number };
 }) => {
   const ref = useRef<HTMLParagraphElement>(null);
@@ -38,10 +39,10 @@ const TranslationBox = (props: {
         ref={ref}
         style={{
           transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-          opacity: translation && position ? 1 : 0,
+          opacity: translation !== null && position ? 1 : 0,
         }}
       >
-        {displayedTranslation}
+        {displayedTranslation || <LoaderCircle className="animate-spin" />}
       </p>
     </div>
   );

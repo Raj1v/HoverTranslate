@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { SentenceItem, TranslationData } from '@/app/lib/types'; // Adjust the import path as necessary
 
 type TranslationContextProps = {
-  translationData: TranslationData | null;
-  setTranslationData: React.Dispatch<React.SetStateAction<TranslationData | null>>;
+  translationData: TranslationData;
+  setTranslationData: React.Dispatch<React.SetStateAction<TranslationData>>;
 };
 
 export const TranslationContext = createContext<TranslationContextProps | undefined>(undefined);
